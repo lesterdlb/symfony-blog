@@ -1,0 +1,72 @@
+version: '3.5'
+
+services:
+    service-web:
+        container_name: service-web
+        build:
+            context: ./docker/nginx
+            args:
+                UID: $U_ID
+        ports:
+            - 1000:80
+        volumes:
+            - ./app:/appdata/www/app
+            - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+        depends_on:
+            - service-php-pfm
+        networks:
+            - network
+
+    service-php-pfm:
+        container_name: service-php-pfm
+        build:
+            context: docker/php
+            args:
+                UID: $U_ID
+        volumes:
+            - ./:/appdata/www
+            - ./docker/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+
+        ###> XDEBUG 3 ###
+        # Use your client IP here
+        # Linux: run "ip a | grep docker0"
+        # Windows (with WSL2) and Mac: host.docker.internal
+        environment:
+            XDEBUG_CLIENT_HOST: host.docker.internal
+            XDEBUG_CLIENT_PORT: 9000
+            PHP_IDE_CONFIG: serverName=docker-dev-env-for-symfony
+        networks:
+            - network
+
+    service-db:
+        container_name: service-db
+        build:
+            context: ./docker/database
+        ports:
+            - 10000:3306
+        environment:
+            MYSQL_DATABASE: database
+            MYSQL_ROOT_PASSWORD: root
+        volumes:
+            - service-db-data:/var/lib/mysql
+        networks:
+            - network
+        command:
+            ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+
+    service-mailhog:
+        container_name: service-mailhog
+        image: mailhog/mailhog:latest
+        restart: always
+        ports:
+            - 1026:1025
+            - 8026:8025
+        networks:
+            - network
+
+volumes:
+    service-db-data:
+
+networks:
+    network:
+        external: true
