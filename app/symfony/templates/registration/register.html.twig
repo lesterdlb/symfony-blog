@@ -2,17 +2,60 @@
 
 {% block title %}Register{% endblock %}
 
+{% block javascripts %}
+    <script>
+    </script>
+{% endblock %}
+
 {% block body %}
-    <h1>Register</h1>
+    <div class="row mb-2 pt-4">
+        <h4 class="mb-3">Registration Form</h4>
+        {{ form_start(registrationForm, {'attr': {'class': not registrationForm.vars.valid ? 'needs-validation was-validated' : 'needs-validation', 'novalidate' : 'true'}}) }}
+        <div class="row g-3">
+            <div class="col-12">
+                {{ form_label(registrationForm.email, null, {'label_attr': {'class': 'form-label'}}) }}
+                <div class="input-group has-validation">
+                    <span class="input-group-text">@</span>
+                    {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
+                    <div class="invalid-feedback">
+                        {{ form_errors(registrationForm.email) }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                {{ form_label(registrationForm.name, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(registrationForm.name, {'attr': {'class': 'form-control'}}) }}
+                <div class="invalid-feedback">
+                    {{ form_errors(registrationForm.name) }}
+                </div>
+            </div>
+            <div class="col-12">
+                <label for="{{ registrationForm.plainPassword.vars.id }}" class="form-label">
+                    Password
+                    <span class="text-muted">
+                         ({{ registrationForm.plainPassword.vars.help }})
+                    </span>
+                </label>
 
-    {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.name) }}
-        {{ form_row(registrationForm.plainPassword, {
-            label: 'Password'
-        }) }}
-        {{ form_row(registrationForm.agreeTerms) }}
 
-        <button type="submit" class="btn">Register</button>
-    {{ form_end(registrationForm) }}
+                {#                {{ form_label(registrationForm.plainPassword, 'Password', {'label_attr': {'class': 'form-label'}}) }} #}
+                <span>
+
+                </span>
+                {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control'}}) }}
+                <div class="invalid-feedback">
+                    {{ form_errors(registrationForm.plainPassword) }}
+                </div>
+            </div>
+        </div>
+        <hr class="my-4">
+        <div class="form-check">
+            {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
+            {{ form_label(registrationForm.agreeTerms, null, {'label_attr': {'class': 'form-check-label'}}) }}
+        </div>
+        <hr class="my-4">
+        <button type="submit" class="w-100 btn btn-primary btn-lg">Register</button>
+        {{ form_rest(registrationForm) }}
+        {{ form_end(registrationForm) }}
+    </div>
 {% endblock %}
