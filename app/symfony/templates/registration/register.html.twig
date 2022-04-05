@@ -2,11 +2,6 @@
 
 {% block title %}Register{% endblock %}
 
-{% block javascripts %}
-    <script>
-    </script>
-{% endblock %}
-
 {% block body %}
     <div class="row mb-2 pt-4">
         <h4 class="mb-3">Registration Form</h4>
@@ -36,12 +31,6 @@
                          ({{ registrationForm.plainPassword.vars.help }})
                     </span>
                 </label>
-
-
-                {#                {{ form_label(registrationForm.plainPassword, 'Password', {'label_attr': {'class': 'form-label'}}) }} #}
-                <span>
-
-                </span>
                 {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control'}}) }}
                 <div class="invalid-feedback">
                     {{ form_errors(registrationForm.plainPassword) }}

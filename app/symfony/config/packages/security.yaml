@@ -25,6 +25,10 @@ security:
                 login_path: app_login
                 check_path: app_login
 
+            remember_me:
+                secret:   '%kernel.secret%'
+                lifetime: 604800
+
             logout:
                 path: app_logout
         secured_area:
