@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\PostRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 class Post
@@ -87,7 +88,7 @@ class Post
         return $this->user;
     }
 
-    public function setUser(?User $user): self
+    public function setUser(null|User|UserInterface $user): self
     {
         $this->user = $user;
 
