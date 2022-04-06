@@ -7,6 +7,7 @@
         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
             <h2>Hello: {{ app.user.name }}</h2>
             <h2>Email: {{ app.user.email }}</h2>
+            <h2>Rol: {{ app.user.roles|join(' - ') }}</h2>
         {% endif %}
     </div>
 {% endblock %}
