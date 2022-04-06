@@ -2,7 +2,7 @@
 
 namespace App\Config;
 
-enum States: string
+enum PostStatus: string
 {
     case Draft = 'DRAFT';
     case Published = 'PUBLISHED';

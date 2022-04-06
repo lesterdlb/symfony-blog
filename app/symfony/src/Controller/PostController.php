@@ -2,16 +2,19 @@
 
 namespace App\Controller;
 
-use App\Config\States;
+use App\Config\PostStatus;
+use App\Config\Roles;
 use App\Entity\Post;
 use App\Form\PostType;
 use App\Repository\PostRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/post')]
+#[Route('/posts')]
+#[IsGranted('ROLE_EDITOR')]
 class PostController extends AbstractController
 {
     private PostRepository $postRepository;
@@ -25,7 +28,7 @@ class PostController extends AbstractController
     public function index(): Response
     {
         return $this->render('post/index.html.twig', [
-            'posts' => $this->postRepository->findAll(),
+            'posts' => $this->postRepository->findBy(['status' => PostStatus::Published->value])
         ]);
     }
 
@@ -38,9 +41,10 @@ class PostController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $post->setDate(new \DateTime());
-            $post->setStatus(States::Draft->value);
+            $post->setStatus(PostStatus::Draft->value);
             $post->setUser($this->getUser());
             $this->postRepository->add($post);
+
             return $this->redirectToRoute('app_post_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -66,6 +70,7 @@ class PostController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->postRepository->add($post);
+
             return $this->redirectToRoute('app_post_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -78,7 +83,7 @@ class PostController extends AbstractController
     #[Route('/{id}', name: 'app_post_delete', methods: ['POST'])]
     public function delete(Request $request, Post $post): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$post->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $post->getId(), $request->request->get('_token'))) {
             $this->postRepository->remove($post);
         }
 

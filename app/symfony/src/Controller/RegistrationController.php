@@ -16,14 +16,29 @@ use Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator;
 
 class RegistrationController extends AbstractController
 {
-    #[Route('/register', name: 'app_register')]
-    public function register(
-        Request $request,
+    private FormLoginAuthenticator $formLoginAuthenticator;
+    private UserAuthenticatorInterface $userAuthenticator;
+    private UserPasswordHasherInterface $userPasswordHasher;
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(
         FormLoginAuthenticator $formLoginAuthenticator,
         UserAuthenticatorInterface $userAuthenticator,
         UserPasswordHasherInterface $userPasswordHasher,
-        EntityManagerInterface $entityManager): Response
-    {
+        EntityManagerInterface $entityManager
+    ) {
+        $this->formLoginAuthenticator = $formLoginAuthenticator;
+        $this->userAuthenticator      = $userAuthenticator;
+        $this->userPasswordHasher     = $userPasswordHasher;
+        $this->entityManager          = $entityManager;
+    }
+
+    #[Route('/register', name: 'app_register')]
+    public function register(
+        Request $request,
+
+
+    ): Response {
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
@@ -31,18 +46,19 @@ class RegistrationController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $user->setName($form->get('name')->getData());
             $user->setPassword(
-            $userPasswordHasher->hashPassword(
+                $this->userPasswordHasher->hashPassword(
                     $user,
                     $form->get('plainPassword')->getData()
                 )
             );
             $user->setRoles([Roles::User->value]);
 
-            $entityManager->persist($user);
-            $entityManager->flush();
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+
             // do anything else you need here, like send an email
 
-            return $userAuthenticator->authenticateUser($user, $formLoginAuthenticator, $request);
+            return $this->userAuthenticator->authenticateUser($user, $this->formLoginAuthenticator, $request);
         }
 
         return $this->render('registration/register.html.twig', [
