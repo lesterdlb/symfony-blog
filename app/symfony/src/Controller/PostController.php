@@ -55,7 +55,7 @@ class PostController extends AbstractController
             1
         );
 
-        return $this->render('post/index.html.twig', [
+        return $this->render('post/dashboard.html.twig', [
             'posts' => $posts
         ]);
     }
