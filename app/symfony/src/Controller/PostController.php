@@ -5,10 +5,12 @@ namespace App\Controller;
 use App\Config\PostStatus;
 use App\Config\Roles;
 use App\Entity\Post;
+use App\Entity\User;
 use App\Form\PostType;
 use App\Repository\PostRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -25,11 +27,27 @@ class PostController extends AbstractController
     }
 
     #[Route('/', name: 'app_post_index', methods: ['GET'])]
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $page = $request->query->get('page', 1);
+
+        /** @var User $user */
+        $user = $this->getUser();
+
         return $this->render('post/index.html.twig', [
-            'posts' => $this->postRepository->findBy(['status' => PostStatus::Published->value])
+            'posts' => $this->postRepository->findByStatus('DRAFT', $user->getId(), 10, $page)
         ]);
+    }
+
+    #[Route('/api/posts', name: 'app_post_api', methods: ['GET'])]
+    public function indexApi(Request $request): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $posts = $this->postRepository->findByStatus('DRAFT', $user->getId(),10, 2);
+
+        return new JsonResponse($posts);
     }
 
     #[Route('/new', name: 'app_post_new', methods: ['GET', 'POST'])]

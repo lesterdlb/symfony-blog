@@ -5,8 +5,10 @@ namespace App\Repository;
 use App\Entity\Post;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
+use Pagerfanta\Pagerfanta;
 
 /**
  * @method Post|null find($id, $lockMode = null, $lockVersion = null)
@@ -43,5 +45,21 @@ class PostRepository extends ServiceEntityRepository
         if ($flush) {
             $this->_em->flush();
         }
+    }
+
+    public function findByStatus(string $status, int $userId, int $pageSize, int $currentPage): Pagerfanta
+    {
+        $queryBuilder = $this->createQueryBuilder('p')
+                             ->where('p.user = :userId')
+                             ->andWhere('p.status = :status')
+                             ->setParameter('status', $status)
+                             ->setParameter('userId', $userId);
+
+        $pagerfanta = new Pagerfanta(new QueryAdapter($queryBuilder));
+
+        $pagerfanta->setMaxPerPage($pageSize);
+        $pagerfanta->setCurrentPage($currentPage);
+
+        return $pagerfanta;
     }
 }
