@@ -15,8 +15,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/posts')]
-#[IsGranted('ROLE_EDITOR')]
 class PostController extends AbstractController
 {
     private PostRepository $postRepository;
@@ -26,16 +24,39 @@ class PostController extends AbstractController
         $this->postRepository = $postRepository;
     }
 
-    #[Route('/', name: 'app_post_index', methods: ['GET'])]
+    #[Route('/posts', name: 'app_posts', methods: ['GET'])]
     public function index(Request $request): Response
     {
         $page = $request->query->get('page', 1);
 
+        $posts = $this->postRepository->findByStatus(
+            PostStatus::Published->value,
+            10,
+            $page
+        );
+
+        return $this->render('post/index.html.twig', [
+            'posts' => $posts
+        ]);
+    }
+
+    #[IsGranted('ROLE_EDITOR')]
+    #[Route('/dashboard', name: 'app_dashboard', methods: ['GET'])]
+    public function dashboard(Request $request): Response
+    {
         /** @var User $user */
         $user = $this->getUser();
 
+        $page = $request->query->get('page', 1);
+
+        $posts = $this->postRepository->findByUserId(
+            $user->getId(),
+            10,
+            1
+        );
+
         return $this->render('post/index.html.twig', [
-            'posts' => $this->postRepository->findByStatus('DRAFT', $user->getId(), 10, $page)
+            'posts' => $posts
         ]);
     }
 
@@ -45,7 +66,12 @@ class PostController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $posts = $this->postRepository->findByStatus('DRAFT', $user->getId(),10, 2);
+        $posts = $this->postRepository->findByStatus(
+            PostStatus::Published->value,
+            $user->getId(),
+            10,
+            2
+        );
 
         return new JsonResponse($posts);
     }

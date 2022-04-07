@@ -47,14 +47,26 @@ class PostRepository extends ServiceEntityRepository
         }
     }
 
-    public function findByStatus(string $status, int $userId, int $pageSize, int $currentPage): Pagerfanta
+    public function findByStatus(string $status, int $pageSize, int $currentPage): Pagerfanta
+    {
+        $queryBuilder = $this->createQueryBuilder('p')
+                             ->where('p.status = :status')
+                             ->setParameter('status', $status);
+
+        return $this->createPagerfanta($queryBuilder, $pageSize, $currentPage);
+    }
+
+    public function findByUserId(string $userId, int $pageSize, int $currentPage): Pagerfanta
     {
         $queryBuilder = $this->createQueryBuilder('p')
                              ->where('p.user = :userId')
-                             ->andWhere('p.status = :status')
-                             ->setParameter('status', $status)
                              ->setParameter('userId', $userId);
 
+        return $this->createPagerfanta($queryBuilder, $pageSize, $currentPage);
+    }
+
+    private function createPagerfanta(QueryBuilder $queryBuilder, int $pageSize, int $currentPage): Pagerfanta
+    {
         $pagerfanta = new Pagerfanta(new QueryAdapter($queryBuilder));
 
         $pagerfanta->setMaxPerPage($pageSize);
