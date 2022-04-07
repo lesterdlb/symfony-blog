@@ -60,22 +60,6 @@ class PostController extends AbstractController
         ]);
     }
 
-    #[Route('/api/posts', name: 'app_post_api', methods: ['GET'])]
-    public function indexApi(Request $request): Response
-    {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        $posts = $this->postRepository->findByStatus(
-            PostStatus::Published->value,
-            $user->getId(),
-            10,
-            2
-        );
-
-        return new JsonResponse($posts);
-    }
-
     #[Route('/new', name: 'app_post_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
