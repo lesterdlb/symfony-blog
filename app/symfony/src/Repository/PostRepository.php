@@ -51,7 +51,8 @@ class PostRepository extends ServiceEntityRepository
     {
         $queryBuilder = $this->createQueryBuilder('p')
                              ->where('p.status = :status')
-                             ->setParameter('status', $status);
+                             ->setParameter('status', $status)
+                             ->orderBy('p.date', 'DESC');
 
         return $this->createPagerfanta($queryBuilder, $pageSize, $currentPage);
     }
@@ -60,7 +61,8 @@ class PostRepository extends ServiceEntityRepository
     {
         $queryBuilder = $this->createQueryBuilder('p')
                              ->where('p.user = :userId')
-                             ->setParameter('userId', $userId);
+                             ->setParameter('userId', $userId)
+                             ->orderBy('p.date', 'DESC');;
 
         return $this->createPagerfanta($queryBuilder, $pageSize, $currentPage);
     }
