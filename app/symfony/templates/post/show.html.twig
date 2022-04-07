@@ -3,7 +3,7 @@
 {% block title %}Post{% endblock %}
 
 {% block body %}
-    <h1>Post</h1>
+    <h1>Your Posts</h1>
 
     <table class="table">
         <tbody>
@@ -30,7 +30,7 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_post_index') }}">back to list</a>
+    <a href="{{ path('app_posts') }}">back to list</a>
 
     <a href="{{ path('app_post_edit', {'id': post.id}) }}">edit</a>
 

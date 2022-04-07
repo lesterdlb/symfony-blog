@@ -3,41 +3,42 @@
 {% block title %}Post index{% endblock %}
 
 {% block body %}
-    <h1>Post index</h1>
-
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Id</th>
-            <th>Title</th>
-            <th>Date</th>
-            <th>Content</th>
-            <th>Status</th>
-            <th>actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for post in posts %}
+    <div class="row mb-2 pt-4">
+        <h1>TITLE</h1>
+        <table class="table">
+            <thead>
             <tr>
-                <td>{{ post.id }}</td>
-                <td>{{ post.title }}</td>
-                <td>{{ post.date ? post.date|date('Y-m-d') : '' }}</td>
-                <td>{{ post.content }}</td>
-                <td>{{ post.status }}</td>
-                <td>
-                    <a href="{{ path('app_post_show', {'id': post.id}) }}">show</a>
-                    <a href="{{ path('app_post_edit', {'id': post.id}) }}">edit</a>
-                </td>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Content</th>
+                <th>Status</th>
+                <th>actions</th>
             </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_post_new') }}">Create new</a>
-    <hr />
-    {{ pagerfanta(posts) }}
+            </thead>
+            <tbody>
+            {% for post in posts %}
+                <tr>
+                    <td>{{ post.id }}</td>
+                    <td>{{ post.title }}</td>
+                    <td>{{ post.date ? post.date|date('Y-m-d') : '' }}</td>
+                    <td>{{ post.content }}</td>
+                    <td>{{ post.status }}</td>
+                    <td>
+                        <a href="{{ path('app_post_show', {'id': post.id}) }}">show</a>
+                        <a href="{{ path('app_post_edit', {'id': post.id}) }}">edit</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6">no records found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <div class="mb-3">
+            <a href="{{ path('app_post_new') }}" class="btn btn-primary">Create new</a>
+        </div>
+        {{ pagerfanta(posts) }}
+    </div>
 {% endblock %}
