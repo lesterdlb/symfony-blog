@@ -10,7 +10,6 @@ use App\Form\PostType;
 use App\Repository\PostRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -29,8 +28,9 @@ class PostController extends AbstractController
     {
         $page = $request->query->get('page', 1);
 
-        $posts = $this->postRepository->findByStatus(
+        $posts = $this->postRepository->findByValue(
             PostStatus::Published->value,
+            'status',
             10,
             $page
         );
@@ -49,11 +49,16 @@ class PostController extends AbstractController
 
         $page = $request->query->get('page', 1);
 
-        $posts = $this->postRepository->findByUserId(
-            $user->getId(),
-            10,
-            $page
-        );
+        if ($this->isGranted(Roles::Moderator->value)) {
+            $posts = $this->postRepository->findByValue(null, null, 10, $page);
+        } else {
+            $posts = $this->postRepository->findByValue(
+                $user->getId(),
+                'user',
+                10,
+                $page
+            );
+        }
 
         return $this->render('post/dashboard.html.twig', [
             'posts' => $posts

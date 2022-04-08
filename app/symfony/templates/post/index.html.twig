@@ -8,7 +8,7 @@
             <article class="blog-post">
                 <h2 class="blog-post-title">{{ post.title }}</h2>
                 <p class="blog-post-meta">{{ post.date ? post.date|date('Y-m-d') : '' }}
-                    <a href="#">{{ post.user.name }}</a>
+                    - <a href="#">{{ post.user.name }}</a>
                 </p>
                 <p>
                     {{ post.content }}

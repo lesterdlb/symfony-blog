@@ -31,13 +31,13 @@
                         <td class="text-secondary">{{ post.status }}</td>
                     {% endif %}
                     <td>
-                        <a href="{{ path('app_post_show', {'id': post.id}) }}">show</a>
-                        <a href="{{ path('app_post_edit', {'id': post.id}) }}">edit</a>
+                        <a href="{{ path('app_post_show', {'id': post.id}) }}">Show</a> |
+                        <a href="{{ path('app_post_edit', {'id': post.id}) }}">Edit</a>
                     </td>
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="6">no records found</td>
+                    <td colspan="6">No records found</td>
                 </tr>
             {% endfor %}
             </tbody>
