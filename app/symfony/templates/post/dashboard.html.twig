@@ -23,7 +23,13 @@
                     <td>{{ post.title }}</td>
                     <td>{{ post.date ? post.date|date('Y-m-d') : '' }}</td>
                     <td>{{ post.content }}</td>
-                    <td>{{ post.status }}</td>
+                    {% if post.status == constant('App\\Config\\PostStatus::Published').value %}
+                        <td class="text-success">{{ post.status }}</td>
+                    {% elseif post.status == constant('App\\Config\\PostStatus::Rejected').value %}
+                        <td class="text-danger">{{ post.status }}</td>
+                    {% else %}
+                        <td class="text-secondary">{{ post.status }}</td>
+                    {% endif %}
                     <td>
                         <a href="{{ path('app_post_show', {'id': post.id}) }}">show</a>
                         <a href="{{ path('app_post_edit', {'id': post.id}) }}">edit</a>

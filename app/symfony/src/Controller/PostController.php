@@ -52,7 +52,7 @@ class PostController extends AbstractController
         $posts = $this->postRepository->findByUserId(
             $user->getId(),
             10,
-            1
+            $page
         );
 
         return $this->render('post/dashboard.html.twig', [
