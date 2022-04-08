@@ -10,6 +10,8 @@ use App\Form\PostType;
 use App\Repository\PostRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -78,7 +80,7 @@ class PostController extends AbstractController
             $post->setUser($this->getUser());
             $this->postRepository->add($post);
 
-            return $this->redirectToRoute('app_posts', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->renderForm('post/new.html.twig', [
@@ -87,11 +89,32 @@ class PostController extends AbstractController
         ]);
     }
 
-    #[Route('posts/{id}', name: 'app_post_show', methods: ['GET'])]
-    public function show(Post $post): Response
+    #[Route('posts/{id}', name: 'app_post_show', methods: ['GET', 'POST'])]
+    public function show(Post $post, Request $request): Response
     {
+        $form = $this->createFormBuilder()
+                     ->add('newStatus', ChoiceType::class, [
+                         'choices' => [
+                             PostStatus::Draft->value     => PostStatus::Draft->value,
+                             PostStatus::Published->value => PostStatus::Published->value,
+                             PostStatus::Rejected->value  => PostStatus::Rejected->value,
+                         ],
+                         'label'   => 'Current Status:',
+                         'data'    => $post->getStatus()
+                     ])
+                     ->add('send', SubmitType::class, ['label' => 'Change Status'])
+                     ->getForm();
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $post->setStatus($form->get('newStatus')->getData());
+            $this->postRepository->add($post);
+        }
+
         return $this->render('post/show.html.twig', [
             'post' => $post,
+            'form' => $form->createView()
         ]);
     }
 
@@ -104,7 +127,7 @@ class PostController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->postRepository->add($post);
 
-            return $this->redirectToRoute('app_posts', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->renderForm('post/edit.html.twig', [
@@ -120,6 +143,6 @@ class PostController extends AbstractController
             $this->postRepository->remove($post);
         }
 
-        return $this->redirectToRoute('app_posts', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
     }
 }
