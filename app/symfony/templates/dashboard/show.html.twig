@@ -43,8 +43,8 @@
 
         <div>
             <a href="{{ path('app_dashboard') }}" class="btn btn-primary">back to list</a>
-            <a href="{{ path('app_post_edit', {'id': post.id}) }}">edit</a>
-            {{ include('post/_delete_form.html.twig') }}
+            <a href="{{ path('dashboard_post_edit', {'id': post.id}) }}">edit</a>
+            {{ include('dashboard/_delete_form.html.twig') }}
         </div>
     </div>
 {% endblock %}

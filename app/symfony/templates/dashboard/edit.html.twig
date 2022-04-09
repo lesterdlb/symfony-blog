@@ -1,15 +1,17 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Post{% endblock %}
+{% block title %}Edit Post{% endblock %}
 
 {% block body %}
     <div class="row mb-2 pt-4">
-        <h1>Create new Post</h1>
+        <h1>Edit Post</h1>
 
-        {{ include('post/_form.html.twig') }}
+        {{ include('dashboard/_form.html.twig', {'button_label': 'Update'}) }}
 
         <div>
             <a href="{{ path('app_dashboard') }}" class="btn btn-primary">back to list</a>
         </div>
+
+        {{ include('dashboard/_delete_form.html.twig') }}
     </div>
 {% endblock %}

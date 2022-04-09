@@ -1,10 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Post index{% endblock %}
+{% block title %}Dashboard index{% endblock %}
 
 {% block body %}
     <div class="row mb-2 pt-4">
-        <h1>TITLE</h1>
+        <h1>Your posts</h1>
         <table class="table">
             <thead>
             <tr>
@@ -31,8 +31,8 @@
                         <td class="text-secondary">{{ post.status }}</td>
                     {% endif %}
                     <td>
-                        <a href="{{ path('app_post_show', {'id': post.id}) }}">Show</a> |
-                        <a href="{{ path('app_post_edit', {'id': post.id}) }}">Edit</a>
+                        <a href="{{ path('dashboard_post_show', {'id': post.id}) }}">Show</a> |
+                        <a href="{{ path('dashboard_post_edit', {'id': post.id}) }}">Edit</a>
                     </td>
                 </tr>
             {% else %}
@@ -43,7 +43,7 @@
             </tbody>
         </table>
         <div class="mb-3">
-            <a href="{{ path('app_post_new') }}" class="btn btn-primary">Create new</a>
+            <a href="{{ path('dashboard_post_new') }}" class="btn btn-primary">Create new</a>
         </div>
         {{ pagerfanta(posts) }}
     </div>
