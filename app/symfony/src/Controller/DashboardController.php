@@ -8,23 +8,26 @@ use App\Entity\Post;
 use App\Entity\User;
 use App\Form\PostType;
 use App\Repository\PostRepository;
+use App\Event\PostReviewed;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[IsGranted('ROLE_EDITOR')]
 class DashboardController extends AbstractController
 {
     private PostRepository $postRepository;
+    private EventDispatcherInterface $dispatcher;
 
-    public function __construct(PostRepository $postRepository)
+    public function __construct(PostRepository $postRepository, EventDispatcherInterface $dispatcher)
     {
         $this->postRepository = $postRepository;
+        $this->dispatcher     = $dispatcher;
     }
 
     #[Route('/dashboard', name: 'app_dashboard', methods: ['GET'])]
@@ -97,6 +100,10 @@ class DashboardController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $post->setStatus($form->get('newStatus')->getData());
             $this->postRepository->add($post);
+
+            /** @var User $user */
+            $user = $this->getUser();
+            $this->dispatcher->dispatch(new PostReviewed($post, $user->getEmail()));
         }
 
         return $this->render('dashboard/show.html.twig', [
