@@ -26,23 +26,24 @@
             </tr>
             </tbody>
         </table>
-        <hr/>
-        <div class="col-4">
-            {{ form_start(form) }}
-            {{ form_label(form.newStatus, null, {'label_attr': {'class': 'form-label'}}) }}
 
-            <div class="input-group mb-3">
-                {{ form_widget(form.newStatus, {'attr': {'class': 'form-control'}}) }}
-                {{ form_widget(form.send, {'attr': {'class': 'btn btn-primary'}}) }}
+        {% if is_granted(constant('App\\Config\\Roles::Moderator').value) %}
+            <div class="col-4">
+                {{ form_start(form) }}
+                {{ form_label(form.newStatus, null, {'label_attr': {'class': 'form-label'}}) }}
+
+                <div class="input-group mb-3">
+                    {{ form_widget(form.newStatus, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_widget(form.send, {'attr': {'class': 'btn btn-primary'}}) }}
+                </div>
+                {{ form_end(form) }}
             </div>
-            {{ form_end(form) }}
-        </div>
-        <hr/>
+            <hr/>
+        {% endif %}
+
         <div>
             <a href="{{ path('app_dashboard') }}" class="btn btn-primary">back to list</a>
-
             <a href="{{ path('app_post_edit', {'id': post.id}) }}">edit</a>
-
             {{ include('post/_delete_form.html.twig') }}
         </div>
     </div>

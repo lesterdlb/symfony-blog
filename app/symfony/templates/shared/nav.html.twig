@@ -1,6 +1,4 @@
 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-    <li><a href="{{ path('app_home') }}" class="nav-link px-2 text-secondary">Home</a></li>
-
     {% if is_granted('IS_AUTHENTICATED_FULLY') and is_granted('ROLE_EDITOR')  %}
         <li><a href="{{ path('app_dashboard') }}" class="nav-link px-2 text-secondary">Dashboard</a></li>
     {% endif %}
