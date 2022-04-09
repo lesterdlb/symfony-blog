@@ -23,11 +23,12 @@ class PostApiController extends AbstractController
     public function index(Request $request): Response
     {
         $page = $request->query->get('page', 1);
+        $pageSize = $request->query->get('pageSize', 10);
 
         $posts = $this->postRepository->findByValue(
             PostStatus::Draft->value,
             'status',
-            10,
+            $pageSize,
             $page
         );
 
