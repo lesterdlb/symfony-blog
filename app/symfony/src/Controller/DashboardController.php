@@ -104,7 +104,7 @@ class DashboardController extends AbstractController
         ]);
     }
 
-    #[Route('/dashboard/{id}/edit', name: 'dashboard_post_edit', methods: ['GET', 'POST'])]
+    #[Route('/dashboard/edit/{id}', name: 'dashboard_post_edit', methods: ['GET', 'POST'])]
     public function edit(int $id, Request $request): Response
     {
         $post = $this->checkPermission($id);
@@ -138,20 +138,13 @@ class DashboardController extends AbstractController
 
     private function checkPermission(int $id): Post
     {
-        if ($this->isGranted(Roles::Moderator->value)) {
-            $post = $this->postRepository->findBy(['id' => $id], null, 1);
-        } else {
-            $post = $this->postRepository->findBy(
-                ['id' => $id, 'user' => $this->getUser()],
-                null,
-                1
-            );
-        }
+        $post = $this->postRepository->findOneById($id);
+        $user = $this->getUser();
 
-        if (empty($post)) {
+        if ( ! $post || ($post->getUser() !== $user and ! $this->isGranted(Roles::Moderator->value))) {
             throw new NotFoundHttpException();
         }
 
-        return $post[0];
+        return $post;
     }
 }
