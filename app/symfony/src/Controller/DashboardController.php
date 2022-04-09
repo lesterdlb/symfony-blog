@@ -76,7 +76,8 @@ class DashboardController extends AbstractController
     #[Route('/dashboard/{id}', name: 'dashboard_post_show', methods: ['GET', 'POST'])]
     public function show(int $id, Request $request): Response
     {
-        $post = $this->checkPermission($id);
+        $post = $this->postRepository->findOneById($id);
+        $this->denyAccessUnlessGranted('view', $post);
 
         $form = $this->createFormBuilder()
                      ->add('newStatus', ChoiceType::class, [
@@ -107,7 +108,8 @@ class DashboardController extends AbstractController
     #[Route('/dashboard/edit/{id}', name: 'dashboard_post_edit', methods: ['GET', 'POST'])]
     public function edit(int $id, Request $request): Response
     {
-        $post = $this->checkPermission($id);
+        $post = $this->postRepository->findOneById($id);
+        $this->denyAccessUnlessGranted('edit', $post);
 
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
@@ -127,24 +129,13 @@ class DashboardController extends AbstractController
     #[Route('/dashboard/delete/{id}', name: 'dashboard_post_delete', methods: ['POST'])]
     public function delete(int $id, Request $request): Response
     {
-        $post = $this->checkPermission($id);
+        $post = $this->postRepository->findOneById($id);
+        $this->denyAccessUnlessGranted('delete', $post);
 
         if ($this->isCsrfTokenValid('delete' . $post->getId(), $request->request->get('_token'))) {
             $this->postRepository->remove($post);
         }
 
         return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
-    }
-
-    private function checkPermission(int $id): Post
-    {
-        $post = $this->postRepository->findOneById($id);
-        $user = $this->getUser();
-
-        if ( ! $post || ($post->getUser() !== $user and ! $this->isGranted(Roles::Moderator->value))) {
-            throw new NotFoundHttpException();
-        }
-
-        return $post;
     }
 }
