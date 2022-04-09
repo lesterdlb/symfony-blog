@@ -14,6 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[IsGranted('ROLE_EDITOR')]
@@ -73,8 +74,10 @@ class DashboardController extends AbstractController
     }
 
     #[Route('/dashboard/{id}', name: 'dashboard_post_show', methods: ['GET', 'POST'])]
-    public function show(Post $post, Request $request): Response
+    public function show(int $id, Request $request): Response
     {
+        $post = $this->checkPermission($id);
+
         $form = $this->createFormBuilder()
                      ->add('newStatus', ChoiceType::class, [
                          'choices' => [
@@ -102,8 +105,10 @@ class DashboardController extends AbstractController
     }
 
     #[Route('/dashboard/{id}/edit', name: 'dashboard_post_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Post $post): Response
+    public function edit(int $id, Request $request): Response
     {
+        $post = $this->checkPermission($id);
+
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
 
@@ -119,13 +124,34 @@ class DashboardController extends AbstractController
         ]);
     }
 
-    #[Route('/dashboard/{id}', name: 'dashboard_post_delete', methods: ['POST'])]
-    public function delete(Request $request, Post $post): Response
+    #[Route('/dashboard/delete/{id}', name: 'dashboard_post_delete', methods: ['POST'])]
+    public function delete(int $id, Request $request): Response
     {
+        $post = $this->checkPermission($id);
+
         if ($this->isCsrfTokenValid('delete' . $post->getId(), $request->request->get('_token'))) {
             $this->postRepository->remove($post);
         }
 
         return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
+    }
+
+    private function checkPermission(int $id): Post
+    {
+        if ($this->isGranted(Roles::Moderator->value)) {
+            $post = $this->postRepository->findBy(['id' => $id], null, 1);
+        } else {
+            $post = $this->postRepository->findBy(
+                ['id' => $id, 'user' => $this->getUser()],
+                null,
+                1
+            );
+        }
+
+        if (empty($post)) {
+            throw new NotFoundHttpException();
+        }
+
+        return $post[0];
     }
 }
