@@ -16,7 +16,7 @@ class LoginController extends AbstractController
         $this->authenticationUtils = $authenticationUtils;
     }
 
-    #[Route('/login', name: 'app_login')]
+    #[Route('/{_locale}/login', name: 'app_login')]
     public function index(): Response
     {
         $error = $this->authenticationUtils->getLastAuthenticationError();

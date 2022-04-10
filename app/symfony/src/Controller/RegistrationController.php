@@ -33,7 +33,7 @@ class RegistrationController extends AbstractController
         $this->entityManager          = $entityManager;
     }
 
-    #[Route('/register', name: 'app_register')]
+    #[Route('/{_locale}/register', name: 'app_register')]
     public function register(Request $request): Response
     {
         $user = new User();

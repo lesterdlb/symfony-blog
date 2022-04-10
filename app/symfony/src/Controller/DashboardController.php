@@ -11,11 +11,7 @@ use App\Repository\PostRepository;
 use App\Event\PostReviewed;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\ButtonType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,7 +30,7 @@ class DashboardController extends AbstractController
         $this->dispatcher     = $dispatcher;
     }
 
-    #[Route('/dashboard', name: 'app_dashboard', methods: ['GET'])]
+    #[Route('/{_locale}/dashboard/', name: 'app_dashboard', methods: ['GET'])]
     public function index(Request $request): Response
     {
         /** @var User $user */
@@ -58,7 +54,7 @@ class DashboardController extends AbstractController
         ]);
     }
 
-    #[Route('/dashboard/new-post', name: 'dashboard_post_new', methods: ['GET', 'POST'])]
+    #[Route('/{_locale}/dashboard/new-post', name: 'dashboard_post_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
         $post = new Post();
@@ -80,7 +76,7 @@ class DashboardController extends AbstractController
         ]);
     }
 
-    #[Route('/dashboard/{id}', name: 'dashboard_post_show', methods: ['GET', 'POST'])]
+    #[Route('/{_locale}/dashboard/{id}', name: 'dashboard_post_show', methods: ['GET', 'POST'])]
     public function show(int $id, Request $request): Response
     {
         /** @var Post $post */
@@ -114,7 +110,7 @@ class DashboardController extends AbstractController
         ]);
     }
 
-    #[Route('/dashboard/edit/{id}', name: 'dashboard_post_edit', methods: ['GET', 'POST'])]
+    #[Route('/{_locale}/dashboard/edit/{id}', name: 'dashboard_post_edit', methods: ['GET', 'POST'])]
     public function edit(int $id, Request $request): Response
     {
         $post = $this->postRepository->findOneById($id);
@@ -135,7 +131,7 @@ class DashboardController extends AbstractController
         ]);
     }
 
-    #[Route('/dashboard/delete/{id}', name: 'dashboard_post_delete', methods: ['POST'])]
+    #[Route('/{_locale}/dashboard/delete/{id}', name: 'dashboard_post_delete', methods: ['POST'])]
     public function delete(int $id, Request $request): Response
     {
         $post = $this->postRepository->findOneById($id);
