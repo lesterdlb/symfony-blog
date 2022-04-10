@@ -8,28 +8,30 @@
         <table class="table">
             <thead>
             <tr>
-                <th>Id</th>
                 <th>Title</th>
                 <th>Date</th>
                 <th>Content</th>
                 <th>Status</th>
-                <th>actions</th>
+                <th>Actions</th>
             </tr>
             </thead>
             <tbody>
             {% for post in posts %}
                 <tr>
-                    <td>{{ post.id }}</td>
                     <td>{{ post.title }}</td>
                     <td>{{ post.date ? post.date|date('Y-m-d') : '' }}</td>
                     <td>{{ post.content }}</td>
-                    {% if post.status == constant('App\\Config\\PostStatus::Published').value %}
-                        <td class="text-success">{{ post.status }}</td>
-                    {% elseif post.status == constant('App\\Config\\PostStatus::Rejected').value %}
-                        <td class="text-danger">{{ post.status }}</td>
-                    {% else %}
-                        <td class="text-secondary">{{ post.status }}</td>
-                    {% endif %}
+
+                    <td>
+                        {% include 'dashboard/_status.html.twig' with {'status': post.status} %}
+                    </td>
+{#                    {% if post.status == constant('App\\Config\\PostStatus::Published').value %}#}
+{#                        <td class="text-success">{{ post.status }}</td>#}
+{#                    {% elseif post.status == constant('App\\Config\\PostStatus::Rejected').value %}#}
+{#                        <td class="text-danger">{{ post.status }}</td>#}
+{#                    {% else %}#}
+{#                        <td class="text-secondary">{{ post.status }}</td>#}
+{#                    {% endif %}#}
                     <td>
                         <a href="{{ path('dashboard_post_show', {'id': post.id}) }}">Show</a> |
                         <a href="{{ path('dashboard_post_edit', {'id': post.id}) }}">Edit</a>
@@ -43,7 +45,7 @@
             </tbody>
         </table>
         <div class="mb-3">
-            <a href="{{ path('dashboard_post_new') }}" class="btn btn-primary">Create new</a>
+            <a href="{{ path('dashboard_post_new') }}" class="btn btn-primary">Create New Post</a>
         </div>
         {{ pagerfanta(posts) }}
     </div>

@@ -8,10 +8,10 @@
 
         {{ include('dashboard/_form.html.twig', {'button_label': 'Update'}) }}
 
-        <div>
-            <a href="{{ path('app_dashboard') }}" class="btn btn-primary">back to list</a>
+        <div class="input-group gap-2 flex-nowrap">
+            <a href="{{ path('app_dashboard') }}" class="btn btn-primary">Back to List</a>
+            {{ include('dashboard/_delete_form.html.twig') }}
         </div>
 
-        {{ include('dashboard/_delete_form.html.twig') }}
     </div>
 {% endblock %}
