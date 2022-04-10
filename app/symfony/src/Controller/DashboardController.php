@@ -11,8 +11,12 @@ use App\Repository\PostRepository;
 use App\Event\PostReviewed;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -79,31 +83,29 @@ class DashboardController extends AbstractController
     #[Route('/dashboard/{id}', name: 'dashboard_post_show', methods: ['GET', 'POST'])]
     public function show(int $id, Request $request): Response
     {
+        /** @var Post $post */
         $post = $this->postRepository->findOneById($id);
         $this->denyAccessUnlessGranted('view', $post);
 
-        $form = $this->createFormBuilder()
-                     ->add('newStatus', ChoiceType::class, [
-                         'choices' => [
-                             PostStatus::Draft->value     => PostStatus::Draft->value,
-                             PostStatus::Published->value => PostStatus::Published->value,
-                             PostStatus::Rejected->value  => PostStatus::Rejected->value,
-                         ],
-                         'label'   => 'Current Status:',
-                         'data'    => $post->getStatus()
-                     ])
-                     ->add('send', SubmitType::class, ['label' => 'Change Status'])
-                     ->getForm();
-
+        $form = $this->createPostStatusForm($post);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $post->setStatus($form->get('newStatus')->getData());
+            $buttonName = $form->getClickedButton()->getName();
+            if ($buttonName === PostStatus::Published->name) {
+                $newStatus = PostStatus::Published->value;
+            } else {
+                $newStatus = PostStatus::Rejected->value;
+            }
+
+            $post->setStatus($newStatus);
             $this->postRepository->add($post);
 
             /** @var User $user */
             $user = $this->getUser();
             $this->dispatcher->dispatch(new PostReviewed($post, $user->getEmail()));
+
+            return $this->redirect($request->getUri());
         }
 
         return $this->render('dashboard/show.html.twig', [
@@ -144,5 +146,28 @@ class DashboardController extends AbstractController
         }
 
         return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
+    }
+
+    private function createPostStatusForm(Post $post): FormInterface
+    {
+        $form = $this->createFormBuilder()
+                     ->add(
+                         PostStatus::Published->name, SubmitType::class, [
+                             'label' => PostStatus::Published->value,
+                             'attr'  => ['class' => 'btn btn-success']
+                         ]
+                     )
+                     ->add(
+                         PostStatus::Rejected->name, SubmitType::class, [
+                             'label' => PostStatus::Rejected->value,
+                             'attr'  => ['class' => 'btn btn-danger']
+                         ]
+                     );
+
+        if ($post->getStatus() !== PostStatus::Draft->value) {
+            $form->remove(PostStatus::from($post->getStatus())->name);
+        }
+
+        return $form->getForm();
     }
 }
