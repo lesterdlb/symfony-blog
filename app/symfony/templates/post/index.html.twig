@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Post index{% endblock %}
+{% block title %}{{ 'List of Article'|trans }}{% endblock %}
 
 {% block body %}
     <div class="row mb-2 pt-4">
@@ -16,7 +16,7 @@
                 <hr>
             </article>
         {% else %}
-            <h3>No Articles found</h3>
+            <h3>{{ 'No Articles found'|trans }}</h3>
         {% endfor %}
     </div>
     {{ pagerfanta(posts) }}

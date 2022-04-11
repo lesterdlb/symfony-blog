@@ -1,5 +1,5 @@
 <form method="post" action="{{ path('dashboard_post_delete', {'id': post.id}) }}" class="form-inline"
-      onsubmit="return confirm('Are you sure you want to delete this item?');">
+      onsubmit="return confirm('{{ 'Are you sure you want to delete this item?'|trans }}');">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
-    <button class="btn btn-danger">Delete</button>
+    <button class="btn btn-danger">{{ 'Delete'|trans }}</button>
 </form>

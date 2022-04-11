@@ -1,18 +1,18 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Dashboard index{% endblock %}
+{% block title %}{{ 'Dashboard'|trans }}{% endblock %}
 
 {% block body %}
     <div class="row mb-2 pt-4">
-        <h1>Your posts</h1>
+        <h1>{{ 'Your Articles'|trans }}</h1>
         <table class="table">
             <thead>
             <tr>
-                <th>Title</th>
-                <th>Date</th>
-                <th>Content</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>{{ 'Title'|trans }}</th>
+                <th>{{ 'Date'|trans }}</th>
+                <th>{{ 'Content'|trans }}</th>
+                <th>{{ 'Status'|trans }}</th>
+                <th>{{ 'Actions'|trans }}</th>
             </tr>
             </thead>
             <tbody>
@@ -25,19 +25,19 @@
                         {% include 'dashboard/_status.html.twig' with {'status': post.status} %}
                     </td>
                     <td>
-                        <a href="{{ path('dashboard_post_show', {'id': post.id}) }}">Show</a> |
-                        <a href="{{ path('dashboard_post_edit', {'id': post.id}) }}">Edit</a>
+                        <a href="{{ path('dashboard_post_show', {'id': post.id}) }}">{{ 'Show'|trans }}</a> |
+                        <a href="{{ path('dashboard_post_edit', {'id': post.id}) }}">{{ 'Edit'|trans }}</a>
                     </td>
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="6">No records found</td>
+                    <td colspan="6">{{ 'No records found'|trans }}</td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
         <div class="mb-3">
-            <a href="{{ path('dashboard_post_new') }}" class="btn btn-primary">Create New Post</a>
+            <a href="{{ path('dashboard_post_new') }}" class="btn btn-primary">{{ 'Create new Post'|trans }}</a>
         </div>
         {{ pagerfanta(posts) }}
     </div>

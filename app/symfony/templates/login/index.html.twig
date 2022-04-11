@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Login{% endblock %}
+{% block title %}{{ 'Login'|trans }}{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -41,7 +41,7 @@
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
                 <img class="mb-4" src="{{ asset('/img/logo.svg') }}" alt="" height="57">
-                <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+                <h1 class="h3 mb-3 fw-normal">{{ 'Please sign in'|trans }}</h1>
 
                 {% if error %}
                     <div class="alert alert-danger" role="alert">
@@ -51,18 +51,18 @@
 
                 <div class="form-floating">
                     <input type="text" id="username" name="_username" value="{{ last_username }}" class="form-control"/>
-                    <label for="username">Email:</label>
+                    <label for="username">{{ 'Email'|trans }}:</label>
                 </div>
                 <div class="form-floating">
                     <input type="password" class="form-control" id="password" name="_password"/>
-                    <label for="password">Password:</label>
+                    <label for="password">{{ 'Password'|trans }}:</label>
                 </div>
                 <div class="checkbox mb-3">
                     <label>
-                        <input type="checkbox" name="_remember_me" value="remember-me" checked> Remember me
+                        <input type="checkbox" name="_remember_me" value="remember-me" checked> {{ 'Remember me'|trans }}
                     </label>
                 </div>
-                <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
+                <button class="w-100 btn btn-lg btn-primary" type="submit">{{ 'Sign in'|trans }}</button>
             </form>
         </div>
     </div>

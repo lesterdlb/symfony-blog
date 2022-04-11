@@ -1,10 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Register{% endblock %}
+{% block title %}{{ 'Register'|trans }}{% endblock %}
 
 {% block body %}
     <div class="row mb-2 pt-4">
-        <h4 class="mb-3">Registration Form</h4>
+        <h4 class="mb-3">{{ 'Registration Form'|trans }}</h4>
         {{ form_start(registrationForm, {'attr': {'class': not registrationForm.vars.valid ? 'needs-validation was-validated' : 'needs-validation', 'novalidate' : 'true'}}) }}
         <div class="row g-3">
             <div class="col-12">
@@ -26,7 +26,7 @@
             </div>
             <div class="col-12">
                 <label for="{{ registrationForm.plainPassword.vars.id }}" class="form-label">
-                    Password
+                    {{ 'Password'|trans }}
                     <span class="text-muted">
                          ({{ registrationForm.plainPassword.vars.help }})
                     </span>
@@ -43,7 +43,7 @@
             {{ form_label(registrationForm.agreeTerms, null, {'label_attr': {'class': 'form-check-label'}}) }}
         </div>
         <hr class="my-4">
-        <button type="submit" class="w-100 btn btn-primary btn-lg">Register</button>
+        <button type="submit" class="w-100 btn btn-primary btn-lg">{{ 'Register'|trans }}</button>
         {{ form_rest(registrationForm) }}
         {{ form_end(registrationForm) }}
     </div>

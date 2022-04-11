@@ -1,7 +1,7 @@
 <header class="p-3 bg-dark text-white">
     <div class="container">
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-            <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
+            <a href="{{ path('app_posts') }}" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
                 <img src="/img/logo.svg" class="bi me-2" height="32" role="img" aria-label="Bootstrap" alt=""/>
             </a>
 
@@ -9,14 +9,14 @@
 
             <div class="text-end">
                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-                    <a href="#" class="btn btn-outline-light me-2">Hello: {{ app.user.name }}</a>
-                    <a href="{{ path('app_logout') }}" class="btn btn-outline-light me-2">Logout</a>
+                    <a href="#" class="btn btn-outline-light me-2">{{ 'Hello'|trans }}: {{ app.user.name }}</a>
+                    <a href="{{ path('app_logout') }}" class="btn btn-outline-light me-2">{{ 'Logout'|trans }}</a>
                 {% else %}
-                    <a href="{{ path('app_login') }}" class="btn btn-outline-light me-2">Login</a>
-                    <a href="{{ path('app_register') }}" class="btn btn-warning">Sign-up</a>
+                    <a href="{{ path('app_login') }}" class="btn btn-outline-light me-2">{{ 'Login'|trans }}</a>
+                    <a href="{{ path('app_register') }}" class="btn btn-warning">{{ 'Sign-up'|trans }}</a>
                 {% endif %}
             </div>
-            <div class="dropdown">
+            <div class="dropdown ps-2">
                 <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1"
                         data-bs-toggle="dropdown" aria-expanded="false">
                     {{ app.request.locale|locale_name(app.request.locale)|u.title }}
@@ -25,16 +25,14 @@
 
                     <li>
                         <a class="dropdown-item" href="{{ path(app.request.attributes.get('_route'),
-                            app.request.attributes.get('_route_params')|merge({_locale: 'en'})) }}">English
+                            app.request.attributes.get('_route_params')|merge({_locale: 'en'})) }}">{{ 'English'|trans }}
                         </a>
                     </li>
                     <li>
                         <a class="dropdown-item" href="{{ path(app.request.attributes.get('_route'),
-                            app.request.attributes.get('_route_params')|merge({_locale: 'es'})) }}">Spanish
+                            app.request.attributes.get('_route_params')|merge({_locale: 'es'})) }}">{{ 'Spanish'|trans }}
                         </a>
                     </li>
-                    {#                    <li><a class="dropdown-item" href="{{ path('app_posts', {_locale: 'en'}) }}">English</a></li> #}
-                    {#                    <li><a class="dropdown-item" href="{{ path('app_posts', {_locale: 'es'}) }}">Spanish</a></li> #}
                 </ul>
             </div>
         </div>
