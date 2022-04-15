@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Config\Roles;
 use App\Repository\UserRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -20,10 +21,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class UserChangeRoleCommand extends Command
 {
     private UserRepository $userRepository;
+    private LoggerInterface $logger;
 
-    public function __construct(UserRepository $userRepository)
+    public function __construct(UserRepository $userRepository, LoggerInterface $logger)
     {
         $this->userRepository = $userRepository;
+        $this->logger         = $logger;
 
         parent::__construct();
     }
@@ -37,7 +40,6 @@ class UserChangeRoleCommand extends Command
         $io     = new SymfonyStyle($input, $output);
         $helper = $this->getHelper('question');
 
-
         $question = new Question('Please enter the user email: ');
         $email    = $helper->ask($input, $output, $question);
 
@@ -45,6 +47,13 @@ class UserChangeRoleCommand extends Command
 
         if ( ! $user) {
             $io->error(sprintf('The user "%s" does not exists.', $email));
+
+            $this->logger->error(
+                sprintf(
+                    'User email not found: %s',
+                    $email
+                )
+            );
 
             return Command::FAILURE;
         }
@@ -59,6 +68,14 @@ class UserChangeRoleCommand extends Command
         if ( ! in_array($role, $roles)) {
             $io->error(sprintf('The Role "%s" does not exists.', $role));
 
+            $this->logger->error(
+                sprintf(
+                    'Invalid role change attempt -> User: %s, Role: %s',
+                    $user->getUserIdentifier(),
+                    $role
+                )
+            );
+
             return Command::FAILURE;
         }
 
@@ -66,6 +83,14 @@ class UserChangeRoleCommand extends Command
         $this->userRepository->add($user);
 
         $io->success('Role changed successfully.');
+
+        $this->logger->info(
+            sprintf(
+                'The user %s changed role to %s.',
+                $user->getUserIdentifier(),
+                $role
+            )
+        );
 
         return Command::SUCCESS;
     }

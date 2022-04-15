@@ -3,16 +3,19 @@
 namespace App\EventListener;
 
 use App\Event\PostReviewed;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 
 class PostReviewedListener
 {
     private MailerInterface $mailer;
+    private LoggerInterface $logger;
 
-    public function __construct(MailerInterface $mailer)
+    public function __construct(MailerInterface $mailer, LoggerInterface $logger)
     {
         $this->mailer = $mailer;
+        $this->logger = $logger;
     }
 
     public function __invoke(PostReviewed $event)
@@ -33,6 +36,13 @@ class PostReviewedListener
             ->html($body);
 
         $this->mailer->send($email);
+
+        $this->logger->info(
+            sprintf(
+                'Email sent to user: %s',
+                $user->getEmail()
+            )
+        );
     }
 
 }

@@ -6,6 +6,7 @@ use App\Config\Roles;
 use App\Entity\User;
 use App\Form\RegistrationFormType;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,17 +21,20 @@ class RegistrationController extends AbstractController
     private UserAuthenticatorInterface $userAuthenticator;
     private UserPasswordHasherInterface $userPasswordHasher;
     private EntityManagerInterface $entityManager;
+    private LoggerInterface $logger;
 
     public function __construct(
         FormLoginAuthenticator $formLoginAuthenticator,
         UserAuthenticatorInterface $userAuthenticator,
         UserPasswordHasherInterface $userPasswordHasher,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        LoggerInterface $logger
     ) {
         $this->formLoginAuthenticator = $formLoginAuthenticator;
         $this->userAuthenticator      = $userAuthenticator;
         $this->userPasswordHasher     = $userPasswordHasher;
         $this->entityManager          = $entityManager;
+        $this->logger                 = $logger;
     }
 
     #[Route('/{_locale}/register', name: 'app_register')]
@@ -53,7 +57,12 @@ class RegistrationController extends AbstractController
             $this->entityManager->persist($user);
             $this->entityManager->flush();
 
-            // do anything else you need here, like send an email
+            $this->logger->info(
+                sprintf(
+                    'A new user has been registered: %s.',
+                    $user->getUserIdentifier()
+                )
+            );
 
             return $this->userAuthenticator->authenticateUser($user, $this->formLoginAuthenticator, $request);
         }

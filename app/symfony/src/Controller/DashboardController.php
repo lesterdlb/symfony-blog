@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Form\PostType;
 use App\Repository\PostRepository;
 use App\Event\PostReviewed;
+use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -23,11 +24,16 @@ class DashboardController extends AbstractController
 {
     private PostRepository $postRepository;
     private EventDispatcherInterface $dispatcher;
+    private LoggerInterface $logger;
 
-    public function __construct(PostRepository $postRepository, EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        PostRepository $postRepository,
+        EventDispatcherInterface $dispatcher,
+        LoggerInterface $logger
+    ) {
         $this->postRepository = $postRepository;
         $this->dispatcher     = $dispatcher;
+        $this->logger         = $logger;
     }
 
     #[Route('/{_locale}/dashboard/', name: 'app_dashboard', methods: ['GET'])]
@@ -62,10 +68,13 @@ class DashboardController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $user = $this->getUser();
             $post->setDate(new \DateTime());
             $post->setStatus(PostStatus::Draft->value);
-            $post->setUser($this->getUser());
+            $post->setUser($user);
             $this->postRepository->add($post);
+
+            $this->logger->info(sprintf('The user %s created a new article.', $user->getUserIdentifier()));
 
             return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
         }
@@ -113,6 +122,7 @@ class DashboardController extends AbstractController
     #[Route('/{_locale}/dashboard/edit/{id}', name: 'dashboard_post_edit', methods: ['GET', 'POST'])]
     public function edit(int $id, Request $request): Response
     {
+        /** @var Post $post */
         $post = $this->postRepository->findOneById($id);
         $this->denyAccessUnlessGranted('edit', $post);
 
@@ -121,6 +131,14 @@ class DashboardController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->postRepository->add($post);
+
+            $this->logger->info(
+                sprintf(
+                    'The user %s edited the article: %s.',
+                    $this->getUser()->getUserIdentifier(),
+                    $post->getId()
+                )
+            );
 
             return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
         }
@@ -134,10 +152,19 @@ class DashboardController extends AbstractController
     #[Route('/{_locale}/dashboard/delete/{id}', name: 'dashboard_post_delete', methods: ['POST'])]
     public function delete(int $id, Request $request): Response
     {
+        /** @var Post $post */
         $post = $this->postRepository->findOneById($id);
         $this->denyAccessUnlessGranted('delete', $post);
 
         if ($this->isCsrfTokenValid('delete' . $post->getId(), $request->request->get('_token'))) {
+            $this->logger->warning(
+                sprintf(
+                    'The user %s deleted the article: %s.',
+                    $this->getUser()->getUserIdentifier(),
+                    $post->getId()
+                )
+            );
+
             $this->postRepository->remove($post);
         }
 
