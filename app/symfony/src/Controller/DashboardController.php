@@ -68,9 +68,14 @@ class DashboardController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var User $user */
             $user = $this->getUser();
             $post->setDate(new \DateTime());
-            $post->setStatus(PostStatus::Draft->value);
+
+            $post->setStatus(
+                $this->isGranted(Roles::Moderator->value) ?
+                    PostStatus::Published->value : PostStatus::Draft->value
+            );
             $post->setUser($user);
             $this->postRepository->add($post);
 
