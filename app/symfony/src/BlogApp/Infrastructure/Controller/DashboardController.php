@@ -2,15 +2,16 @@
 
 namespace App\BlogApp\Infrastructure\Controller;
 
-use App\BlogApp\Application\Post\CreatePost;
-use App\BlogApp\Application\Post\GetPosts;
+use App\BlogApp\Application\Config\PostStatus;
+use App\BlogApp\Application\Config\Roles;
+use App\BlogApp\Application\UseCases\Post\CreateUpdatePost;
+use App\BlogApp\Application\UseCases\Post\FindOnePostById;
+use App\BlogApp\Application\UseCases\Post\FindPostsByValue;
+use App\BlogApp\Application\UseCases\Post\RemovePost;
 use App\BlogApp\Domain\Entity\Post;
 use App\BlogApp\Domain\Entity\User;
 use App\BlogApp\Domain\Event\PostReviewed;
-use App\BlogApp\Infrastructure\Persistence\Repository\PostRepository;
-use App\Config\PostStatus;
-use App\Config\Roles;
-use App\Form\PostType;
+use App\BlogApp\Infrastructure\Form\PostType;
 use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,24 +25,27 @@ use Symfony\Component\Routing\Annotation\Route;
 #[IsGranted('ROLE_EDITOR')]
 class DashboardController extends AbstractController
 {
-    private PostRepository $postRepository;
-    private GetPosts $getPosts;
-    private CreatePost $createPost;
+    private FindPostsByValue $findPostsByValue;
+    private CreateUpdatePost $createUpdatePost;
+    private FindOnePostById $findOnePostById;
+    private RemovePost $removePost;
     private EventDispatcherInterface $dispatcher;
     private LoggerInterface $logger;
 
     public function __construct(
-        PostRepository $postRepository,
-        GetPosts $getPosts,
-        CreatePost $createPost,
+        FindPostsByValue $findPostsByValue,
+        CreateUpdatePost $createUpdatePost,
+        FindOnePostById $findOnePostById,
+        RemovePost $removePost,
         EventDispatcherInterface $dispatcher,
         LoggerInterface $logger
     ) {
-        $this->postRepository = $postRepository;
-        $this->dispatcher     = $dispatcher;
-        $this->logger         = $logger;
-        $this->getPosts = $getPosts;
-        $this->createPost = $createPost;
+        $this->dispatcher = $dispatcher;
+        $this->logger = $logger;
+        $this->findPostsByValue = $findPostsByValue;
+        $this->createUpdatePost = $createUpdatePost;
+        $this->findOnePostById = $findOnePostById;
+        $this->removePost = $removePost;
     }
 
     #[Route('/{_locale}/dashboard/', name: 'app_dashboard', methods: ['GET'])]
@@ -53,9 +57,9 @@ class DashboardController extends AbstractController
         $page = $request->query->get('page', 1);
 
         if ($this->isGranted(Roles::Moderator->value)) {
-            $posts = $this->getPosts->execute(null, null, 10, $page);
+            $posts = $this->findPostsByValue->execute(null, null, 10, $page);
         } else {
-            $posts = $this->getPosts->execute(
+            $posts = $this->findPostsByValue->execute(
                 $user->getId(),
                 'user',
                 10,
@@ -85,7 +89,7 @@ class DashboardController extends AbstractController
                     PostStatus::Published->value : PostStatus::Draft->value
             );
             $post->setUser($user);
-            $this->createPost->execute($post);
+            $this->createUpdatePost->execute($post);
 
             $this->logger->info(sprintf('The user %s created a new article.', $user->getUserIdentifier()));
 
@@ -101,8 +105,7 @@ class DashboardController extends AbstractController
     #[Route('/{_locale}/dashboard/{id}', name: 'dashboard_post_show', methods: ['GET', 'POST'])]
     public function show(int $id, Request $request): Response
     {
-        /** @var Post $post */
-        $post = $this->postRepository->findOneById($id);
+        $post = $this->findOnePostById->execute($id);
         $this->denyAccessUnlessGranted('view', $post);
 
         $form = $this->createPostStatusForm($post);
@@ -117,7 +120,7 @@ class DashboardController extends AbstractController
             }
 
             $post->setStatus($newStatus);
-            $this->postRepository->add($post);
+            $this->createUpdatePost->execute($post);
 
             /** @var User $user */
             $user = $this->getUser();
@@ -135,15 +138,14 @@ class DashboardController extends AbstractController
     #[Route('/{_locale}/dashboard/edit/{id}', name: 'dashboard_post_edit', methods: ['GET', 'POST'])]
     public function edit(int $id, Request $request): Response
     {
-        /** @var Post $post */
-        $post = $this->postRepository->findOneById($id);
+        $post = $this->findOnePostById->execute($id);
         $this->denyAccessUnlessGranted('edit', $post);
 
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->postRepository->add($post);
+            $this->createUpdatePost->execute($post);
 
             $this->logger->info(
                 sprintf(
@@ -165,8 +167,7 @@ class DashboardController extends AbstractController
     #[Route('/{_locale}/dashboard/delete/{id}', name: 'dashboard_post_delete', methods: ['POST'])]
     public function delete(int $id, Request $request): Response
     {
-        /** @var Post $post */
-        $post = $this->postRepository->findOneById($id);
+        $post = $this->findOnePostById->execute($id);
         $this->denyAccessUnlessGranted('delete', $post);
 
         if ($this->isCsrfTokenValid('delete' . $post->getId(), $request->request->get('_token'))) {
@@ -178,7 +179,7 @@ class DashboardController extends AbstractController
                 )
             );
 
-            $this->postRepository->remove($post);
+            $this->removePost->execute($post);
         }
 
         return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);

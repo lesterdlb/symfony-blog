@@ -1,11 +1,11 @@
 <?php
 
-namespace App\BlogApp\Application\Post;
+namespace App\BlogApp\Application\UseCases\Post;
 
 use App\BlogApp\Domain\Entity\Post;
 use App\BlogApp\Domain\PostRepositoryInterface;
 
-class CreatePost
+class CreateUpdatePost
 {
     private PostRepositoryInterface $postRepository;
 

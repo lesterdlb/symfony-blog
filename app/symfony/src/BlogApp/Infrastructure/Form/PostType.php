@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Form;
+namespace App\BlogApp\Infrastructure\Form;
 
 use App\BlogApp\Domain\Entity\Post;
 use Symfony\Component\Form\AbstractType;

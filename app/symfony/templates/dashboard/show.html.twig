@@ -29,9 +29,9 @@
             </tbody>
         </table>
 
-        {% if is_granted(constant('App\\Config\\Roles::Moderator').value) %}
-            {% set publish = constant('App\\Config\\PostStatus::Published').name %}
-            {% set reject = constant('App\\Config\\PostStatus::Rejected').name %}
+        {% if is_granted(constant(RolesClass ~ '::Moderator').value) %}
+            {% set publish = constant(PostStatusClass ~ '::Published').name %}
+            {% set reject = constant(PostStatusClass ~ '::Rejected').name %}
             {{ form_start(form) }}
             <div class="d-grid gap-2 d-md-block mb-3">
                 <label>{{ 'Change Status'|trans }}: </label>

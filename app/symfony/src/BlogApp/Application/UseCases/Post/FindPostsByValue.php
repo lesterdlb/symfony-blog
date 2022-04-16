@@ -1,11 +1,11 @@
 <?php
 
-namespace App\BlogApp\Application\Post;
+namespace App\BlogApp\Application\UseCases\Post;
 
 use App\BlogApp\Domain\PostRepositoryInterface;
 use Pagerfanta\Pagerfanta;
 
-class GetPosts
+class FindPostsByValue
 {
     private PostRepositoryInterface $postRepository;
 

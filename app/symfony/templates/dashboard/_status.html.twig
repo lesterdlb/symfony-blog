@@ -1,6 +1,6 @@
-{% if status == constant('App\\Config\\PostStatus::Published').value %}
+{% if status == constant(PostStatusClass ~ '::Published').value %}
     <span class="text-success">{{ post.status }}</span>
-{% elseif status == constant('App\\Config\\PostStatus::Rejected').value %}
+{% elseif status == constant(PostStatusClass ~ '::Rejected').value %}
     <span class="text-danger">{{ post.status }}</span>
 {% else %}
     <span class="text-secondary">{{ post.status }}</span>

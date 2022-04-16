@@ -2,8 +2,8 @@
 
 namespace App\BlogApp\Infrastructure\Command;
 
+use App\BlogApp\Application\Config\Roles;
 use App\BlogApp\Infrastructure\Persistence\Repository\UserRepository;
-use App\Config\Roles;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;

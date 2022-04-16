@@ -2,9 +2,9 @@
 
 namespace App\BlogApp\Infrastructure\Controller;
 
+use App\BlogApp\Application\Config\Roles;
 use App\BlogApp\Domain\Entity\User;
-use App\Config\Roles;
-use App\Form\RegistrationFormType;
+use App\BlogApp\Infrastructure\Form\RegistrationFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

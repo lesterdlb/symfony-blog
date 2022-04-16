@@ -1,5 +1,8 @@
 twig:
     default_path: '%kernel.project_dir%/templates'
+    globals:
+        RolesClass: 'App\BlogApp\Application\Config\Roles'
+        PostStatusClass: 'App\BlogApp\Application\Config\PostStatus'
 
 when@test:
     twig:

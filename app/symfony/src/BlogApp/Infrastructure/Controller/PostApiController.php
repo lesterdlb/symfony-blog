@@ -2,8 +2,8 @@
 
 namespace App\BlogApp\Infrastructure\Controller;
 
-use App\BlogApp\Infrastructure\Persistence\Repository\PostRepository;
-use App\Config\PostStatus;
+use App\BlogApp\Application\Config\PostStatus;
+use App\BlogApp\Application\UseCases\Post\FindPostsByValue;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,20 +12,20 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/api')]
 class PostApiController extends AbstractController
 {
-    private PostRepository $postRepository;
+    private FindPostsByValue $findPostsByValue;
 
-    public function __construct(PostRepository $postRepository)
+    public function __construct(FindPostsByValue $findPostsByValue)
     {
-        $this->postRepository = $postRepository;
+        $this->findPostsByValue = $findPostsByValue;
     }
 
     #[Route('/posts', name: 'app_post_api')]
     public function index(Request $request): Response
     {
-        $page = $request->query->get('page', 1);
+        $page     = $request->query->get('page', 1);
         $pageSize = $request->query->get('pageSize', 10);
 
-        $posts = $this->postRepository->findByValue(
+        $posts = $this->findPostsByValue->execute(
             PostStatus::Draft->value,
             'status',
             $pageSize,

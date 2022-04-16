@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Config;
+namespace App\BlogApp\Application\Config;
 
 enum Roles: string
 {
