@@ -10,11 +10,12 @@ doctrine:
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         auto_mapping: true
         mappings:
-            App:
+            BlogApp:
                 is_bundle: false
-                dir: '%kernel.project_dir%/src/Entity'
-                prefix: 'App\Entity'
-                alias: App
+#                type: yml
+                dir: '%kernel.project_dir%/src/BlogApp/Domain/Entity'
+                prefix: 'App\BlogApp\Domain\Entity'
+                alias: BlogApp
 
 when@test:
     doctrine:

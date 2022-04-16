@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Entity;
+namespace App\BlogApp\Domain\Entity;
 
-use App\Repository\PostRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-#[ORM\Entity(repositoryClass: PostRepository::class)]
+#[ORM\Entity]
 class Post
 {
     #[ORM\Id]

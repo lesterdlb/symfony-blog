@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Security\Voter;
+namespace App\BlogApp\Infrastructure\Security\Voter;
 
+use App\BlogApp\Domain\Entity\Post;
+use App\BlogApp\Domain\Entity\User;
 use App\Config\Roles;
-use App\Entity\Post;
-use App\Entity\User;
+
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Security;
@@ -29,7 +30,6 @@ class PostVoter extends Voter
             return false;
         }
 
-        // only vote on `Post` objects
         if ( ! $subject instanceof Post) {
             return false;
         }

@@ -4,3 +4,8 @@ index:
     defaults:
         route: 'app_posts'
         permanent: true
+
+blogapp:
+    resource: '../src/BlogApp/Infrastructure/Controller'
+    prefix: /
+    type: annotation

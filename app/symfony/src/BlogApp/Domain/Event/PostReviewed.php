@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Event;
+namespace App\BlogApp\Domain\Event;
 
-use App\Entity\Post;
+use App\BlogApp\Domain\Entity\Post;
 
 class PostReviewed
 {

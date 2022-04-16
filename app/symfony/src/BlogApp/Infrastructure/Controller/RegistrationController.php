@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Controller;
+namespace App\BlogApp\Infrastructure\Controller;
 
+use App\BlogApp\Domain\Entity\User;
 use App\Config\Roles;
-use App\Entity\User;
 use App\Form\RegistrationFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;

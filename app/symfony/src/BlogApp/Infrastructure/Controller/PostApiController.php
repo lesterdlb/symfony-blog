@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Controller;
+namespace App\BlogApp\Infrastructure\Controller;
 
+use App\BlogApp\Infrastructure\Persistence\Repository\PostRepository;
 use App\Config\PostStatus;
-use App\Repository\PostRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

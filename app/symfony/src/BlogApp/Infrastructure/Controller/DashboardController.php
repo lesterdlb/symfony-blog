@@ -1,14 +1,16 @@
 <?php
 
-namespace App\Controller;
+namespace App\BlogApp\Infrastructure\Controller;
 
+use App\BlogApp\Application\Post\CreatePost;
+use App\BlogApp\Application\Post\GetPosts;
+use App\BlogApp\Domain\Entity\Post;
+use App\BlogApp\Domain\Entity\User;
+use App\BlogApp\Domain\Event\PostReviewed;
+use App\BlogApp\Infrastructure\Persistence\Repository\PostRepository;
 use App\Config\PostStatus;
 use App\Config\Roles;
-use App\Entity\Post;
-use App\Entity\User;
 use App\Form\PostType;
-use App\Repository\PostRepository;
-use App\Event\PostReviewed;
 use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,17 +25,23 @@ use Symfony\Component\Routing\Annotation\Route;
 class DashboardController extends AbstractController
 {
     private PostRepository $postRepository;
+    private GetPosts $getPosts;
+    private CreatePost $createPost;
     private EventDispatcherInterface $dispatcher;
     private LoggerInterface $logger;
 
     public function __construct(
         PostRepository $postRepository,
+        GetPosts $getPosts,
+        CreatePost $createPost,
         EventDispatcherInterface $dispatcher,
         LoggerInterface $logger
     ) {
         $this->postRepository = $postRepository;
         $this->dispatcher     = $dispatcher;
         $this->logger         = $logger;
+        $this->getPosts = $getPosts;
+        $this->createPost = $createPost;
     }
 
     #[Route('/{_locale}/dashboard/', name: 'app_dashboard', methods: ['GET'])]
@@ -45,9 +53,9 @@ class DashboardController extends AbstractController
         $page = $request->query->get('page', 1);
 
         if ($this->isGranted(Roles::Moderator->value)) {
-            $posts = $this->postRepository->findByValue(null, null, 10, $page);
+            $posts = $this->getPosts->execute(null, null, 10, $page);
         } else {
-            $posts = $this->postRepository->findByValue(
+            $posts = $this->getPosts->execute(
                 $user->getId(),
                 'user',
                 10,
@@ -77,7 +85,7 @@ class DashboardController extends AbstractController
                     PostStatus::Published->value : PostStatus::Draft->value
             );
             $post->setUser($user);
-            $this->postRepository->add($post);
+            $this->createPost->execute($post);
 
             $this->logger->info(sprintf('The user %s created a new article.', $user->getUserIdentifier()));
 

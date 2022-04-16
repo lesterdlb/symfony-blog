@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Repository;
+namespace App\BlogApp\Infrastructure\Persistence\Repository;
 
-use App\Entity\Post;
+use App\BlogApp\Domain\Entity\Post;
+use App\BlogApp\Domain\PostRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\QueryBuilder;
@@ -16,7 +17,7 @@ use Pagerfanta\Pagerfanta;
  * @method Post[]    findAll()
  * @method Post[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class PostRepository extends ServiceEntityRepository
+class PostRepository extends ServiceEntityRepository implements PostRepositoryInterface
 {
     public function __construct(ManagerRegistry $registry)
     {

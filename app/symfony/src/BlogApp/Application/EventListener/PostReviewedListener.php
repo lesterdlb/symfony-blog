@@ -1,8 +1,8 @@
 <?php
 
-namespace App\EventListener;
+namespace App\BlogApp\Application\EventListener;
 
-use App\Event\PostReviewed;
+use App\BlogApp\Domain\Event\PostReviewed;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -18,7 +18,7 @@ class PostReviewedListener
         $this->logger = $logger;
     }
 
-    public function __invoke(PostReviewed $event)
+    public function __invoke(PostReviewed $event): void
     {
         $post = $event->getPost();
         $user = $post->getUser();

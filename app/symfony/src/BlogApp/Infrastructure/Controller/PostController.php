@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Controller;
+namespace App\BlogApp\Infrastructure\Controller;
 
+use App\BlogApp\Application\Post\GetPosts;
+use App\BlogApp\Domain\PostRepositoryInterface;
 use App\Config\PostStatus;
-use App\Repository\PostRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,11 +12,13 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class PostController extends AbstractController
 {
-    private PostRepository $postRepository;
+    private PostRepositoryInterface $postRepository;
+    private GetPosts $getPosts;
 
-    public function __construct(PostRepository $postRepository)
+    public function __construct(PostRepositoryInterface $postRepository, GetPosts $getPosts)
     {
         $this->postRepository = $postRepository;
+        $this->getPosts       = $getPosts;
     }
 
     #[Route('/{_locale}/posts/', name: 'app_posts', methods: ['GET'])]
@@ -23,7 +26,7 @@ class PostController extends AbstractController
     {
         $page = $request->query->get('page', 1);
 
-        $posts = $this->postRepository->findByValue(
+        $posts = $this->getPosts->execute(
             PostStatus::Published->value,
             'status',
             10,

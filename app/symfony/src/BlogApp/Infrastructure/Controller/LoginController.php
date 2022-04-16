@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\BlogApp\Infrastructure\Controller;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
