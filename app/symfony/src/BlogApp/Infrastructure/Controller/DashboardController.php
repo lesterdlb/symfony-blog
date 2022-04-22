@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\BlogApp\Infrastructure\Controller;
 
 use App\BlogApp\Application\Config\PostStatus;
@@ -12,7 +14,7 @@ use App\BlogApp\Domain\Entity\Post;
 use App\BlogApp\Domain\Entity\User;
 use App\BlogApp\Domain\Event\PostReviewed;
 use App\BlogApp\Infrastructure\Form\PostType;
-use Psr\Log\LoggerInterface;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -30,7 +32,6 @@ class DashboardController extends AbstractController
     private FindOnePostById $findOnePostById;
     private RemovePost $removePost;
     private EventDispatcherInterface $dispatcher;
-    private LoggerInterface $logger;
 
     public function __construct(
         FindPostsByValue $findPostsByValue,
@@ -38,10 +39,8 @@ class DashboardController extends AbstractController
         FindOnePostById $findOnePostById,
         RemovePost $removePost,
         EventDispatcherInterface $dispatcher,
-        LoggerInterface $logger
     ) {
         $this->dispatcher = $dispatcher;
-        $this->logger = $logger;
         $this->findPostsByValue = $findPostsByValue;
         $this->createUpdatePost = $createUpdatePost;
         $this->findOnePostById = $findOnePostById;
@@ -82,16 +81,15 @@ class DashboardController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var User $user */
             $user = $this->getUser();
-            $post->setDate(new \DateTime());
 
+            $post->setDate(new \DateTime());
             $post->setStatus(
                 $this->isGranted(Roles::Moderator->value) ?
                     PostStatus::Published->value : PostStatus::Draft->value
             );
             $post->setUser($user);
-            $this->createUpdatePost->execute($post);
 
-            $this->logger->info(sprintf('The user %s created a new article.', $user->getUserIdentifier()));
+            $this->createUpdatePost->execute($post, $user->getId());
 
             return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
         }
@@ -112,18 +110,19 @@ class DashboardController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var User $user */
+            $user = $this->getUser();
+
             $buttonName = $form->getClickedButton()->getName();
             if ($buttonName === PostStatus::Published->name) {
                 $newStatus = PostStatus::Published->value;
             } else {
                 $newStatus = PostStatus::Rejected->value;
             }
-
             $post->setStatus($newStatus);
-            $this->createUpdatePost->execute($post);
 
-            /** @var User $user */
-            $user = $this->getUser();
+            $this->createUpdatePost->execute($post, $user->getId());
+
             $this->dispatcher->dispatch(new PostReviewed($post, $user->getEmail()));
 
             return $this->redirect($request->getUri());
@@ -145,15 +144,10 @@ class DashboardController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->createUpdatePost->execute($post);
+            /** @var User $user */
+            $user = $this->getUser();
 
-            $this->logger->info(
-                sprintf(
-                    'The user %s edited the article: %s.',
-                    $this->getUser()->getUserIdentifier(),
-                    $post->getId()
-                )
-            );
+            $this->createUpdatePost->execute($post, $user->getId());
 
             return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
         }
@@ -171,15 +165,10 @@ class DashboardController extends AbstractController
         $this->denyAccessUnlessGranted('delete', $post);
 
         if ($this->isCsrfTokenValid('delete' . $post->getId(), $request->request->get('_token'))) {
-            $this->logger->warning(
-                sprintf(
-                    'The user %s deleted the article: %s.',
-                    $this->getUser()->getUserIdentifier(),
-                    $post->getId()
-                )
-            );
+            /** @var User $user */
+            $user = $this->getUser();
 
-            $this->removePost->execute($post);
+            $this->removePost->execute($post, $user->getId());
         }
 
         return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);

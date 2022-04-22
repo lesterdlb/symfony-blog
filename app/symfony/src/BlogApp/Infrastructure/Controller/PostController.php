@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\BlogApp\Infrastructure\Controller;
 
 use App\BlogApp\Application\Config\PostStatus;
