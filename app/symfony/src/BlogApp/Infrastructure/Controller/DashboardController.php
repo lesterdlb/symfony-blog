@@ -6,6 +6,7 @@ namespace App\BlogApp\Infrastructure\Controller;
 
 use App\BlogApp\Application\Config\PostStatus;
 use App\BlogApp\Application\Config\Roles;
+use App\BlogApp\Application\UseCases\Post\CreatePost;
 use App\BlogApp\Application\UseCases\Post\CreateUpdatePost;
 use App\BlogApp\Application\UseCases\Post\FindOnePostById;
 use App\BlogApp\Application\UseCases\Post\FindPostsByValue;
@@ -29,6 +30,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class DashboardController extends AbstractController
 {
     private FindPostsByValue $findPostsByValue;
+    private CreatePost $createPost;
     private CreateUpdatePost $createUpdatePost;
     private FindOnePostById $findOnePostById;
     private RemovePost $removePost;
@@ -36,12 +38,14 @@ class DashboardController extends AbstractController
 
     public function __construct(
         FindPostsByValue $findPostsByValue,
+        CreatePost $createPost,
         CreateUpdatePost $createUpdatePost,
         FindOnePostById $findOnePostById,
         RemovePost $removePost,
         EventDispatcherInterface $dispatcher,
     ) {
         $this->dispatcher = $dispatcher;
+        $this->createPost = $createPost;
         $this->findPostsByValue = $findPostsByValue;
         $this->createUpdatePost = $createUpdatePost;
         $this->findOnePostById = $findOnePostById;
@@ -75,28 +79,24 @@ class DashboardController extends AbstractController
     #[Route('/{_locale}/dashboard/new-post', name: 'dashboard_post_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
-        $post = new Post();
-        $form = $this->createForm(PostFormType::class, $post);
+        $form = $this->createForm(PostFormType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var User $user */
-            $user = $this->getUser();
+            $data = $form->getData();
 
-            $post->setDate(new \DateTime());
-            $post->setStatus(
+            $this->createPost->execute(
+                $data->getTitle(),
+                $data->getContent(),
                 $this->isGranted(Roles::Moderator->value) ?
-                    PostStatus::Published->value : PostStatus::Draft->value
+                    PostStatus::Published->value : PostStatus::Draft->value,
+                $this->getUser()
             );
-            $post->setUser($user);
-
-            $this->createUpdatePost->execute($post, $user->getId());
 
             return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->renderForm('dashboard/new.html.twig', [
-            'post' => $post,
             'form' => $form,
         ]);
     }
