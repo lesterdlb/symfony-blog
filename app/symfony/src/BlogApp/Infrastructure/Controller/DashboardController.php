@@ -6,6 +6,7 @@ namespace App\BlogApp\Infrastructure\Controller;
 
 use App\BlogApp\Application\Config\PostStatus;
 use App\BlogApp\Application\Config\Roles;
+use App\BlogApp\Application\Form\StatusFormType;
 use App\BlogApp\Application\UseCases\Post\CreatePost;
 use App\BlogApp\Application\UseCases\Post\UpdatePost;
 use App\BlogApp\Application\UseCases\Post\FindOnePostById;
@@ -44,12 +45,12 @@ class DashboardController extends AbstractController
         RemovePost $removePost,
         EventDispatcherInterface $dispatcher,
     ) {
-        $this->dispatcher = $dispatcher;
-        $this->createPost = $createPost;
+        $this->dispatcher       = $dispatcher;
+        $this->createPost       = $createPost;
         $this->findPostsByValue = $findPostsByValue;
-        $this->updatePost = $updatePost;
-        $this->findOnePostById = $findOnePostById;
-        $this->removePost = $removePost;
+        $this->updatePost       = $updatePost;
+        $this->findOnePostById  = $findOnePostById;
+        $this->removePost       = $removePost;
     }
 
     #[Route('/{_locale}/dashboard/', name: 'app_dashboard', methods: ['GET'])]
@@ -58,7 +59,7 @@ class DashboardController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $page = $request->query->get('page', 1);
+        $page = $request->query->getInt('page', 1);
 
         if ($this->isGranted(Roles::Moderator->value)) {
             $posts = $this->findPostsByValue->execute(null, null, 10, $page);
@@ -107,7 +108,7 @@ class DashboardController extends AbstractController
         $post = $this->findOnePostById->execute($id);
         $this->denyAccessUnlessGranted('view', $post);
 
-        $form = $this->createPostStatusForm($post);
+        $form = $this->createForm(StatusFormType::class, null, ['post' => $post]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -173,28 +174,5 @@ class DashboardController extends AbstractController
         }
 
         return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
-    }
-
-    private function createPostStatusForm(Post $post): FormInterface
-    {
-        $form = $this->createFormBuilder()
-                     ->add(
-                         PostStatus::Published->name, SubmitType::class, [
-                             'label' => PostStatus::Published->value,
-                             'attr'  => ['class' => 'btn btn-success']
-                         ]
-                     )
-                     ->add(
-                         PostStatus::Rejected->name, SubmitType::class, [
-                             'label' => PostStatus::Rejected->value,
-                             'attr'  => ['class' => 'btn btn-danger']
-                         ]
-                     );
-
-        if ($post->getStatus() !== PostStatus::Draft->value) {
-            $form->remove(PostStatus::from($post->getStatus())->name);
-        }
-
-        return $form->getForm();
     }
 }
