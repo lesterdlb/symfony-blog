@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\BlogApp\Application\EventListener;
 
 use App\BlogApp\Domain\Event\PostReviewed;
-use Psr\Log\LoggerInterface;
+use App\BlogApp\Domain\LoggerInterface;
+
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 
@@ -38,10 +41,8 @@ class PostReviewedListener
         $this->mailer->send($email);
 
         $this->logger->info(
-            sprintf(
-                'Email sent to user: %s',
-                $user->getEmail()
-            )
+            'Email sent to user',
+            ['Email' => $user->getEmail()]
         );
     }
 

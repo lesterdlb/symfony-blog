@@ -14,14 +14,10 @@ use App\BlogApp\Application\UseCases\Post\FindPostsByValue;
 use App\BlogApp\Application\UseCases\Post\RemovePost;
 use App\BlogApp\Application\Form\PostFormType;
 
-//use App\BlogApp\Domain\Entity\Post;
-use App\BlogApp\Domain\Entity\User;
 use App\BlogApp\Domain\Event\PostReviewed;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -56,16 +52,13 @@ class DashboardController extends AbstractController
     #[Route('/{_locale}/dashboard/', name: 'app_dashboard', methods: ['GET'])]
     public function index(Request $request): Response
     {
-        /** @var User $user */
-        $user = $this->getUser();
-
         $page = $request->query->getInt('page', 1);
 
         if ($this->isGranted(Roles::Moderator->value)) {
             $posts = $this->findPostsByValue->execute(null, null, 10, $page);
         } else {
             $posts = $this->findPostsByValue->execute(
-                $user->getId(),
+                $this->getUser()->getId(),
                 'user',
                 10,
                 $page
@@ -112,7 +105,6 @@ class DashboardController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var User $user */
             $user = $this->getUser();
 
             $buttonName = $form->getClickedButton()->getName();
@@ -146,7 +138,6 @@ class DashboardController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var User $user */
             $user = $this->getUser();
 
             $this->updatePost->execute($post, $user->getId());
@@ -167,7 +158,6 @@ class DashboardController extends AbstractController
         $this->denyAccessUnlessGranted('delete', $post);
 
         if ($this->isCsrfTokenValid('delete' . $post->getId(), $request->request->get('_token'))) {
-            /** @var User $user */
             $user = $this->getUser();
 
             $this->removePost->execute($post, $user->getId());
