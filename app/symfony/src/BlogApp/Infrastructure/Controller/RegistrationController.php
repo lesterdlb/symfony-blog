@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\BlogApp\Infrastructure\Controller;
 
+use App\BlogApp\Application\Form\RegistrationFormType;
 use App\BlogApp\Application\Config\Roles;
 use App\BlogApp\Domain\Entity\User;
-use App\BlogApp\Infrastructure\Form\RegistrationFormType;
+
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

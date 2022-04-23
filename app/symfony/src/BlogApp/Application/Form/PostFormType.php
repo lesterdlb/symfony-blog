@@ -1,13 +1,16 @@
 <?php
 
-namespace App\BlogApp\Infrastructure\Form;
+declare(strict_types=1);
+
+namespace App\BlogApp\Application\Form;
 
 use App\BlogApp\Domain\Entity\Post;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class PostType extends AbstractType
+class PostFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

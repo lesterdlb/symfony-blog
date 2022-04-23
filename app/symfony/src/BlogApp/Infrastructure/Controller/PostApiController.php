@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\BlogApp\Infrastructure\Controller;
 
 use App\BlogApp\Application\Config\PostStatus;
 use App\BlogApp\Application\UseCases\Post\FindPostsByValue;
+
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

@@ -10,10 +10,11 @@ use App\BlogApp\Application\UseCases\Post\CreateUpdatePost;
 use App\BlogApp\Application\UseCases\Post\FindOnePostById;
 use App\BlogApp\Application\UseCases\Post\FindPostsByValue;
 use App\BlogApp\Application\UseCases\Post\RemovePost;
+use App\BlogApp\Application\Form\PostFormType;
+
 use App\BlogApp\Domain\Entity\Post;
 use App\BlogApp\Domain\Entity\User;
 use App\BlogApp\Domain\Event\PostReviewed;
-use App\BlogApp\Infrastructure\Form\PostType;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -75,7 +76,7 @@ class DashboardController extends AbstractController
     public function new(Request $request): Response
     {
         $post = new Post();
-        $form = $this->createForm(PostType::class, $post);
+        $form = $this->createForm(PostFormType::class, $post);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -140,7 +141,7 @@ class DashboardController extends AbstractController
         $post = $this->findOnePostById->execute($id);
         $this->denyAccessUnlessGranted('edit', $post);
 
-        $form = $this->createForm(PostType::class, $post);
+        $form = $this->createForm(PostFormType::class, $post);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
