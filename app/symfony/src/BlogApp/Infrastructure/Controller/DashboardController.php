@@ -7,13 +7,13 @@ namespace App\BlogApp\Infrastructure\Controller;
 use App\BlogApp\Application\Config\PostStatus;
 use App\BlogApp\Application\Config\Roles;
 use App\BlogApp\Application\UseCases\Post\CreatePost;
-use App\BlogApp\Application\UseCases\Post\CreateUpdatePost;
+use App\BlogApp\Application\UseCases\Post\UpdatePost;
 use App\BlogApp\Application\UseCases\Post\FindOnePostById;
 use App\BlogApp\Application\UseCases\Post\FindPostsByValue;
 use App\BlogApp\Application\UseCases\Post\RemovePost;
 use App\BlogApp\Application\Form\PostFormType;
 
-use App\BlogApp\Domain\Entity\Post;
+//use App\BlogApp\Domain\Entity\Post;
 use App\BlogApp\Domain\Entity\User;
 use App\BlogApp\Domain\Event\PostReviewed;
 
@@ -31,7 +31,7 @@ class DashboardController extends AbstractController
 {
     private FindPostsByValue $findPostsByValue;
     private CreatePost $createPost;
-    private CreateUpdatePost $createUpdatePost;
+    private UpdatePost $updatePost;
     private FindOnePostById $findOnePostById;
     private RemovePost $removePost;
     private EventDispatcherInterface $dispatcher;
@@ -39,7 +39,7 @@ class DashboardController extends AbstractController
     public function __construct(
         FindPostsByValue $findPostsByValue,
         CreatePost $createPost,
-        CreateUpdatePost $createUpdatePost,
+        UpdatePost $updatePost,
         FindOnePostById $findOnePostById,
         RemovePost $removePost,
         EventDispatcherInterface $dispatcher,
@@ -47,7 +47,7 @@ class DashboardController extends AbstractController
         $this->dispatcher = $dispatcher;
         $this->createPost = $createPost;
         $this->findPostsByValue = $findPostsByValue;
-        $this->createUpdatePost = $createUpdatePost;
+        $this->updatePost = $updatePost;
         $this->findOnePostById = $findOnePostById;
         $this->removePost = $removePost;
     }
@@ -122,7 +122,7 @@ class DashboardController extends AbstractController
             }
             $post->setStatus($newStatus);
 
-            $this->createUpdatePost->execute($post, $user->getId());
+            $this->updatePost->execute($post, $user->getId());
 
             $this->dispatcher->dispatch(new PostReviewed($post, $user->getEmail()));
 
@@ -148,7 +148,7 @@ class DashboardController extends AbstractController
             /** @var User $user */
             $user = $this->getUser();
 
-            $this->createUpdatePost->execute($post, $user->getId());
+            $this->updatePost->execute($post, $user->getId());
 
             return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
         }

@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\BlogApp\Application\UseCases\Post;
 
 use App\BlogApp\Domain\Entity\Post;
 use App\BlogApp\Domain\LoggerInterface;
 use App\BlogApp\Domain\PostRepositoryInterface;
 
-class CreateUpdatePost
+class UpdatePost
 {
     private PostRepositoryInterface $postRepository;
     private LoggerInterface $logger;
