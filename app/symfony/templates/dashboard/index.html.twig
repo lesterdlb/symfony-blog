@@ -9,6 +9,9 @@
             <thead>
             <tr>
                 <th>{{ 'Title'|trans }}</th>
+                {% if is_granted(constant(RolesClass ~ '::Moderator').value) %}
+                    <th>{{ 'User'|trans }}</th>
+                {% endif %}
                 <th>{{ 'Date'|trans }}</th>
                 <th>{{ 'Content'|trans }}</th>
                 <th>{{ 'Status'|trans }}</th>
@@ -19,6 +22,9 @@
             {% for post in posts %}
                 <tr>
                     <td>{{ post.title }}</td>
+                    {% if is_granted(constant(RolesClass ~ '::Moderator').value) %}
+                        <td>{{ post.user.name }}</td>
+                    {% endif %}
                     <td>{{ post.date ? post.date|date('Y-m-d') : '' }}</td>
                     <td>{{ post.content }}</td>
                     <td>
