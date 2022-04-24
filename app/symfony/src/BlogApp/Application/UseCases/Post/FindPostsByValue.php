@@ -14,7 +14,7 @@ class FindPostsByValue
         $this->postRepository = $postRepository;
     }
 
-    public function execute(null|string $value, null|string $name, int $pageSize, int $currentPage): Pagerfanta
+    public function execute(null|string|int $value, null|string $name, int $pageSize, int $currentPage): Pagerfanta
     {
         return $this->postRepository->findByValue($value, $name, $pageSize, $currentPage);
     }

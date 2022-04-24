@@ -12,8 +12,9 @@ doctrine:
         mappings:
             BlogApp:
                 is_bundle: false
-#                type: yml
-                dir: '%kernel.project_dir%/src/BlogApp/Domain/Entity'
+                type: xml
+                #                dir: '%kernel.project_dir%/src/BlogApp/Domain/Entity'
+                dir: '%kernel.project_dir%/src/BlogApp/Infrastructure/Persistence/Mappings'
                 prefix: 'App\BlogApp\Domain\Entity'
                 alias: BlogApp
 

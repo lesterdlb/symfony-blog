@@ -1,32 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\BlogApp\Domain\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\UserInterface;
-
-#[ORM\Entity]
 class Post
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\Column(type: 'string', length: 255)]
     private $title;
 
-    #[ORM\Column(type: 'date')]
     private $date;
 
-    #[ORM\Column(type: 'text')]
     private $content;
 
-    #[ORM\Column(type: 'string', length: 255)]
     private $status;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'posts')]
-    #[ORM\JoinColumn(nullable: false)]
     private $user;
 
     public function getId(): ?int
@@ -87,7 +76,7 @@ class Post
         return $this->user;
     }
 
-    public function setUser(null|User|UserInterface $user): self
+    public function setUser(null|User $user): self
     {
         $this->user = $user;
 
