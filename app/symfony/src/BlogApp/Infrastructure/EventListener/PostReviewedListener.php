@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\BlogApp\Application\EventListener;
+namespace App\BlogApp\Infrastructure\EventListener;
 
 use App\BlogApp\Domain\Event\PostReviewed;
-use App\BlogApp\Domain\LoggerInterface;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 
