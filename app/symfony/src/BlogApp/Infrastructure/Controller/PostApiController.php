@@ -25,8 +25,8 @@ class PostApiController extends AbstractController
     #[Route('/posts', name: 'app_post_api')]
     public function index(Request $request): Response
     {
-        $page     = $request->query->get('page', 1);
-        $pageSize = $request->query->get('pageSize', 10);
+        $page     = $request->query->getInt('page', 1);
+        $pageSize = $request->query->getInt('pageSize', 10);
 
         $posts = $this->findPostsByValue->execute(
             PostStatus::Draft->value,
