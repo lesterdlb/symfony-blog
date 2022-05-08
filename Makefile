@@ -2,9 +2,9 @@
 
 OS = $(shell uname)
 UID = $(shell id -u)
-APP = service-php-pfm
-WEB = service-web
-DB = service-db
+APP = symfony-blog-php-pfm
+WEB = symfony-blog-web
+DB = symfony-blog-db
 
 help: ## Show this help message
 	@echo 'usage: make [target]'
@@ -31,6 +31,9 @@ restart: ## Restart the containers
 build: ## Rebuilds all the containers
 	docker network create network || true
 	U_ID=${UID} docker-compose build
+
+composer: ## Install composer dependencies
+	U_ID=${UID} docker exec -it --user ${UID} ${APP} sh -c "cd app/symfony && composer install"
 
 ssh-php-fpm: ## bash into the be container
 	U_ID=${UID} docker exec -it --user ${UID} ${APP} bash
